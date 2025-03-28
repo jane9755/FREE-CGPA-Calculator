@@ -1,0 +1,187 @@
+<html>
+<head>
+    <title>CGPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(-45deg, #ff416c, #ff4b2b, #1d2b64, #009fff);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: black;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+
+        button {
+            background: #ff416c;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #ff4b2b;
+        }
+
+        .dark-mode {
+            background: #121212;
+            color: white;
+        }
+
+        .dark-mode .container {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: black;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .branding {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: #ff416c;
+            text-shadow: 0 0 10px #ff416c, 0 0 20px #ff4b2b;
+            font-weight: bold;
+        }
+
+        .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .delete-btn {
+            font-size: 10px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: red;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    <div class="container">
+        <h2>🔥 CGPA Calculator 🔥</h2>
+        <p>Calculate your GPA per semester before computing your CGPA.</p>
+        <select id="semester">
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+        </select>
+        <input type="text" id="courseName" placeholder="Course Name">
+        <input type="number" id="courseCredit" placeholder="Credit Unit">
+        <select id="courseGrade">
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+        </select>
+        <button onclick="addCourse()">➕ Add Course</button>
+        <button onclick="clearCourses()">🗑️ Clear All</button>
+        <div id="courseList"></div>
+        <button onclick="calculateCGPA()">💯 Calculate CGPA</button>
+        <h3 id="cgpaResult"></h3>
+        <p id="encouragementMessage"></p>
+    </div>
+    <div class="branding">Built with love by fadjantemor</div>
+    <script>
+        let courses = [];
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+
+        function addCourse() {
+            const courseName = document.getElementById("courseName").value;
+            const courseCredit = parseInt(document.getElementById("courseCredit").value);
+            const courseGrade = document.getElementById("courseGrade").value;
+            const semester = document.getElementById("semester").value;
+            if (courseName && courseCredit && courseGrade) {
+                courses.push({ courseName, courseCredit, courseGrade, semester });
+                renderCourses();
+            }
+        }
+
+        function renderCourses() {
+            const courseList = document.getElementById("courseList");
+            courseList.innerHTML = "";
+            courses.forEach((course, index) => {
+                courseList.innerHTML += `<div class='course-item'>${course.courseName} - ${course.courseCredit} credits - Grade: ${course.courseGrade} (Semester ${course.semester}) <button class='delete-btn' onclick="removeCourse(${index})">❌</button></div>`;
+            });
+        }
+
+        function removeCourse(index) {
+            courses.splice(index, 1);
+            renderCourses();
+        }
+
+        function calculateCGPA() {
+            let totalCredits = 0, totalGradePoints = 0;
+            let gradePoints = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1, 'F': 0 };
+            courses.forEach(course => {
+                totalCredits += course.courseCredit;
+                totalGradePoints += gradePoints[course.courseGrade] * course.courseCredit;
+            });
+            let cgpa = totalCredits ? (totalGradePoints / totalCredits).toFixed(2) : 0;
+            document.getElementById("cgpaResult").innerText = `Your CGPA: ${cgpa}`;
+            let classCategory = cgpa >= 4.5 ? "First Class - Big Boss! 🎓" : cgpa >= 3.5 ? "Second Class Upper - Sharp Guy! 💪" : cgpa >= 2.5 ? "Second Class Lower - Keep pushing! 🚀" : cgpa >= 1.5 ? "Third Class - More hustle! 🔥" : "Pass - More effort needed! 💯";
+            document.getElementById("encouragementMessage").innerText = `You dey ${classCategory}! Keep moving! 🚀`;
+        }
+    </script>
+</body>
+</html>
